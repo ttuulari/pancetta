@@ -12,12 +12,10 @@
             value (if (nil? last-val)
                     (<! in)
                     last-val)]
-        (println "value" value)
         (if (nil? value)
           (close! out)
           (match (alts! [in timer])
-                 [_ timer]     (do (println "timer")
-                                   (>! out value)
+                 [_ timer]     (do (>! out value)
                                    (recur nil))
                  [new-val _]   (recur new-val)))))
     out))
