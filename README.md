@@ -8,6 +8,7 @@ FIXME: Write a paragraph about the library/project and highlight its goals.
 
 ## Setup
 
+#rlwrap lein trampoline run -m clojure.main path/to/clojurescript/script/repl.clj
 
 ## License
 
