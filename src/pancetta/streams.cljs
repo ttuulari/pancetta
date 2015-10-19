@@ -8,15 +8,15 @@
 
 (defn sample
   [ms in]
-  (let [out (chan)]
+  (let [out   (chan)]
     (go-loop
       [] 
-      (<! (timeout ms))
       (let [timer  (timeout ms)]
         (match (alts! [in timer])
                [nil in]  (close! out)
                [v in]    (do
                            (>! out v)
+                           (<! (timeout ms))
                            (recur))
                [_ timer] (recur))))
     out))

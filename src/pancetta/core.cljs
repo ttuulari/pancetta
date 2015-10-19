@@ -4,11 +4,13 @@
             [cljs.core.async :as async :refer [chan <! >! alts! timeout]]
             [pancetta.streams :as s]))
 
+(node/enable-util-print!)
+
 (defn test-sampling
   []
-  (let [c       (chan)
+  (let [c       (async/chan)
         _       (async/onto-chan c (range 5))
-        sampled (s/sample 100 c)]
+        sampled (s/sample 1000 c)]
     (s/consume println sampled)))
 
 (defn -main []
