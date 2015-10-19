@@ -12,3 +12,4 @@ node_modules/
 repl/
 scripts/
 .cljs_node_repl
+dev-resources
