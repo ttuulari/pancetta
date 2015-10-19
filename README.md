@@ -1,14 +1,17 @@
 # pancetta
 
-FIXME: Write a one-line description of your library/project.
+ClojureScript library for time dependent core.async channel operations.
 
 ## Overview
 
-FIXME: Write a paragraph about the library/project and highlight its goals.
-
 ## Setup
+### Prerequisities
+Install node, rlwrap and clojurescript.
 
-#rlwrap lein trampoline run -m clojure.main path/to/clojurescript/script/repl.clj
+### Start autobuild
+`lein cljsbuild auto dev`
+### Start Node repl
+`rlwrap lein trampoline run -m clojure.main path/to/clojurescript/script/repl.clj`
 
 ## License
 
