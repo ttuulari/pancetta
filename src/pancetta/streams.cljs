@@ -41,6 +41,7 @@
                                                  (recur nil))
                      ; In channel closed
                      [[nil in] _] (if (nil? value)
+                                    ; In channel closed and no current value
                                     (close! out)
                                     ; In channel closed,
                                     ; but current value not sent out yet
