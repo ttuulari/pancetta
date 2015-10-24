@@ -13,7 +13,15 @@
         sampled (s/sample 1000 c)]
     (s/consume println sampled)))
 
+(defn test-debounce
+  []
+  (let [c       (async/chan)
+        _       (async/onto-chan c (range 5))
+        sampled (s/sample 1000 c)
+        deb     (s/debounce 2000 sampled) ]
+    (s/consume println deb)))
+
 (defn -main []
-  (test-sampling))
+  (test-debounce))
 
 (set! *main-cli-fn* -main)

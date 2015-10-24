@@ -27,40 +27,28 @@
   ([ms in]
    (debounce ms (chan) in))
   ([ms out in]
-   (go-loop [latest nil]
+   (go-loop [value nil]
             (let [t (timeout ms)
                   s (t/epoch)]
-              (match [(alts! [in t]) latest in]
-                     [[_ t] nil _]  (recur nil)
-                     [[_ t] latest _]    (do  ;timeout, stuff in
-                                             (println "c2")
-                                             (>! out latest)
-                                             (recur nil))
-                     [[(v :guard some?) in] _ _]   (do 
-                                                     (println "c3" v)
-                                                     (recur v))
-                     [[nil in] _ _] (if (nil? latest)
-                                      (close! out)
-                                      (let [diff (- ms
-                                                    (- (t/epoch) s))]
-                                        (<! (timeout diff))
-                                        (>! out latest)
-                                        (close! out))))))
-   out))
-
-#_(defn debounce
-  ([ms in]
-   (debounce ms (chan) in))
-  ([ms out in]
-   (go
-     (loop [timeout nil]
-       (let [loc (<! in)]
-         (println loc)
-         (when timeout
-           (js/clearTimeout timeout))
-         (let [t (js/setTimeout #(go (>! out loc))
-                                ms)]
-           (recur t)))))
+              (match [(alts! [in t]) value]
+                     ; New value in
+                     [[(v :guard some?) in] _] (recur v)
+                     ; Timeout: no value in yet
+                     [[_ t] nil]               (recur nil)
+                     ; Timeout: value in, send to out and reset latest value
+                     [[_ t] value]             (do
+                                                 (>! out value)
+                                                 (recur nil))
+                     ; In channel closed
+                     [[nil in] _] (if (nil? value)
+                                    (close! out)
+                                    ; In channel closed,
+                                    ; but current value not sent out yet
+                                    (let [diff (- ms
+                                                  (- (t/epoch) s))]
+                                      (<! (timeout diff))
+                                      (>! out value)
+                                      (close! out))))))
    out))
 
 (defn consume [f c]
