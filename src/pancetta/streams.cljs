@@ -8,6 +8,7 @@
 (node/enable-util-print!)
 
 (defn sample
+  "Periodically sample in channel. Returns out channel that gets sampled values."
   ([ms in]
    (sample ms (chan) in))
   ([ms out in]
@@ -24,6 +25,7 @@
    out))
 
 (defn debounce
+  "Mimics jQuery debounce. Returns out channel with debounced values."
   ([ms in]
    (debounce ms (chan) in))
   ([ms out in]
