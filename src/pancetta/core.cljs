@@ -9,17 +9,19 @@
 (defn test-sampling
   []
   (let [c       (async/chan)
-        _       (async/onto-chan c (range 5))
-        sampled (s/sample 1000 c)]
-    (s/consume println sampled)))
+        _       (async/onto-chan c (range 5))]
+    (->> c
+         (s/sample 1000)
+         (s/consume println))))
 
 (defn test-debounce
   []
   (let [c       (async/chan)
-        _       (async/onto-chan c (range 5))
-        sampled (s/sample 1000 c)
-        deb     (s/debounce 2000 sampled) ]
-    (s/consume println deb)))
+        _       (async/onto-chan c (range 5))]
+    (->> c
+         (s/sample 1000)
+         (s/debounce 2000)
+         (s/consume println))))
 
 (defn -main []
   (test-debounce))
