@@ -1,6 +1,6 @@
 (ns pancetta.streams
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-  (:require [cljs.core.async :as async :refer [chan <! >! alts! timeout close!]]
+  (:require [cljs.core.async :as async :refer [chan <! >! alts! timeout close! pipe]]
             [cljs.nodejs :as node]
             [cljs.core.match :refer-macros [match]]
             [pancetta.time :as t])) 
@@ -9,9 +9,9 @@
 
 (defn sample
   "Periodically sample in channel. Returns out channel that gets sampled values."
-  ([ms in]
-   (sample ms (chan) in))
-  ([ms out in]
+  ([in ms]
+   (sample in ms (chan)))
+  ([in ms out]
    (go-loop
      [] 
      (let [timer  (timeout ms)]
@@ -26,9 +26,9 @@
 
 (defn debounce
   "Mimics jQuery debounce. Returns out channel with debounced values."
-  ([ms in]
-   (debounce ms (chan) in))
-  ([ms out in]
+  ([in ms]
+   (debounce in ms (chan)))
+  ([in ms out]
    (go-loop [value nil]
             (let [t (timeout ms)
                   s (t/epoch)]
@@ -54,7 +54,14 @@
                                       (close! out))))))
    out))
 
-(defn consume [f c]
+(defn pipe-trans
+  "Pipe values from in channel through transducer xf. Returns piped out channel."
+  [in xf]
+  (let [out (chan 1 xf)]
+    (pipe in out)
+    out))
+
+(defn consume [c f]
   (go (loop []
         (when-some [v (<! c)]
           (f v)
