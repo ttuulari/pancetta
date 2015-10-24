@@ -45,8 +45,8 @@
                      [[nil in] _] (if (nil? value)
                                     ; In channel closed and no current value
                                     (close! out)
-                                    ; In channel closed,
-                                    ; but current value not sent out yet
+                                    ; In channel closed.
+                                    ; Wait remaining time and send value out.
                                     (let [diff (- ms
                                                   (- (t/epoch) s))]
                                       (<! (timeout diff))
