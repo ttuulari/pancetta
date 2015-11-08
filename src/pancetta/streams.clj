@@ -1,11 +1,7 @@
 (ns pancetta.streams
-  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-  (:require [cljs.core.async :as async :refer [chan <! >! alts! timeout close! pipe]]
-            [cljs.nodejs :as node]
-            [cljs.core.match :refer-macros [match]]
+  (:require [clojure.core.async :as async :refer [go go-loop chan <! >! alts! timeout close! pipe]]
+            [clojure.core.match :refer-macros [match]]
             [pancetta.time :as t])) 
-
-(node/enable-util-print!)
 
 (defn sample
   "Periodically sample in channel. Returns out channel that gets sampled values."

@@ -1,10 +1,6 @@
 (ns pancetta.core
-  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-  (:require [cljs.nodejs :as node]
-            [cljs.core.async :as async :refer [chan <! >! alts! timeout]]
+  (:require [clojure.core.async :as async :refer [go go-loop chan <! >! alts! timeout]]
             [pancetta.streams :as s]))
-
-(node/enable-util-print!)
 
 (defn test-sampling
   []
@@ -34,7 +30,4 @@
         (s/pipe-trans xf)
         (s/consume println))))
 
-(defn -main []
-  (test-xf))
 
-(set! *main-cli-fn* -main)
