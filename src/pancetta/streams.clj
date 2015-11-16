@@ -50,6 +50,51 @@
                                       (close! out))))))
    out))
 
+(defn delayed
+  "Delay events by ms. Returns out channel with delayed events."
+  ([in ms]
+   (delayed in ms (chan) (chan)))
+  ([in ms out silent]
+   (go-loop
+     [to     (chan)
+      q      []
+      closed false
+      i      in]
+     (match
+       [(alts! [i to]) q closed]
+       ; First value received from in, start a timer of ms
+       [[(v :guard some?) i] [] _]  (recur (timeout ms)
+                                           (conj q {:stamp (+ (t/epoch) ms)
+                                                    :value v})
+                                           closed
+                                           i)
+       ; Value received from in, don't start a timer
+       [[(v :guard some?) i] _ _]   (recur to
+                                           (conj q {:stamp (+ (t/epoch) ms)
+                                                    :value v})
+                                           closed
+                                           i)
+       ; Input closed
+       [[nil i] _ false]            (recur to q true silent)
+       ; Timeout, input closed, and queue empty: close out
+       [[_ to] [] true]             (close! out)
+       ; Timout, values in queue, send to out
+       [[_ to] q _]                 (let [[f s & t] q]
+                                      (>! out (:value f))
+                                      (if s
+                                        ; Second value in queue present, start timer
+                                        (recur (timeout (- (:stamp s)
+                                                           (t/epoch)))
+                                               (vec (rest q))
+                                               closed
+                                               i)
+                                        ; No second value, no timer
+                                        (recur silent 
+                                               (vec (rest q))
+                                               closed
+                                               i)))))
+   out))
+
 (defn pipe-trans
   "Pipe values from in channel through transducer xf. Returns piped out channel."
   [in xf]
